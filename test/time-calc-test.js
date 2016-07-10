@@ -1,10 +1,54 @@
 var assert = require('chai').assert
 var timeCalc = require('../time-calc')
-// describe('Correct input',function(){
-//   it('input should be a string', function(done){
-//     assert.equal('string', typeof )
-//   })
-// })
+describe('Should throw errors',function(){
+  it('if hours are outside range 0 - 23', function(done){
+    assert.equal(timeCalc('26:00:00').add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('-03:00:00').add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('26:00:00').subtract(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('-03:00:00').subtract(1,'s') instanceof Error, true)
+    done()
+  }),
+  it('if minutes are outside range 0 - 59', function(done){
+    assert.equal(timeCalc('23:62:00').add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('03:-4:00').add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('23:62:00').subtract(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('03:-4:00').subtract(1,'s') instanceof Error, true)
+    done()
+  }),
+  it('if seconds are outside range 0 - 59', function(done){
+    assert.equal(timeCalc('22:00:-01').add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('03:00:63').add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('22:00:-01').subtract(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('03:00:63').subtract(1,'s') instanceof Error, true)
+    done()
+  }),
+  it('if time is not received as a string', function(done){
+    assert.equal(timeCalc(2200).add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc(2200).subtract(1,'s') instanceof Error, true)
+    done()
+  }),
+  it('if time is not received in the format \'HH:MM:SS\'', function(done){
+    assert.equal(timeCalc('22:00').add(1,'s') instanceof Error, true)
+    assert.equal(timeCalc('22:00').subtract(1,'s') instanceof Error, true)
+    done()
+  }),
+  it('if first argument of add method is not a number', function(done){
+    assert.equal(timeCalc('22:00:00').add('notANumber','s') instanceof Error, true)
+    done()
+  }),
+  it('if first argument of subtract method is not a number', function(done){
+    assert.equal(timeCalc('22:00:00').subtract('notANumber','s') instanceof Error, true)
+    done()
+  }),
+  it('if second argument of add method does not begin with \'h\',\'m\' or \'s\'', function(done){
+    assert.equal(timeCalc('22:00:00').add('notANumber','days') instanceof Error, true)
+    done()
+  }),
+  it('if second argument of subtract method does not begin with \'h\',\'m\' or \'s\'', function(done){
+    assert.equal(timeCalc('22:00:00').subtract('notANumber','days') instanceof Error, true)
+    done()
+  })
+}),
 describe('Adding time', function(){
   it('should add correct number of seconds',function(done){
     assert.equal('12:00:01',timeCalc('12:00:00').add(1,'s'))

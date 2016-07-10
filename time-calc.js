@@ -8,7 +8,7 @@ function timeCalc(time){
   }
 
   function normalize(returnArray){
-    return returnArray.map(function(part,i){
+    return returnArray.map(function(part){
       part = part.length < 2 ? '0' + part : part
       return part
     }).join(':')
@@ -16,33 +16,37 @@ function timeCalc(time){
 
   function validation(unit, num, method){
     if(time.length < 8 || time.length > 8){
-      return new Error('Time argument must be received in the format \'HH:MM:SS\' ')
+      throw 'Time argument must be received in the format \'HH:MM:SS\''
     }
     if(typeof time !== 'string'){
-      return new Error('Time argument must be a string')
+      throw 'Time argument must be a string'
     }
     if(isNaN(num)){
-      return new Error('First argument of ' + method + ' method must be a number')
+      throw 'First argument of ' + method + ' method must be a number'
     }
     if(hour > 23 || hour < 0){
-      return new Error('Hours must be between 0 and 23')
+      throw 'Hours must be between 0 and 23'
     }
     if(minute > 59 || minute < 0){
-      return new Error('Minutes must be between 0 and 59')
+      throw 'Minutes must be between 0 and 59'
     }
     if(second > 59 || second < 0){
-      return new Error('Seconds must be between 0 and 59')
+      throw 'Seconds must be between 0 and 59'
     }
     if(['h','m','s'].indexOf(unit[0]) < 0 ){
-      return new Error('Second argument of '+ method + ' method must be hours, minutes or seconds')
+      throw 'Second argument of '+ method + ' method must be hours, minutes or seconds'
     }
   }
 
   return {
 
     add: function addTime(num, unit){
-      var err = validation(unit, num, 'add');
-      if(err) return err
+      try {
+        validation(unit, num, 'add')
+      }
+      catch(err){
+        return new Error(err)
+      }
       switch(unit[0]){
         case 'h':
         hour = (hour + num) % 24
@@ -63,8 +67,12 @@ function timeCalc(time){
     },
 
     subtract: function subtractTime(num, unit){
-      var err = validation(unit, num, 'subtract');
-      if(err) return err
+      try {
+        validation(unit, num, 'subtract')
+      }
+      catch(err){
+        return new Error(err)
+      }
       var count = 0;
       switch(unit[0]){
         case 'h':
@@ -104,9 +112,3 @@ function timeCalc(time){
 }
 
 module.exports = timeCalc
-
-// console.log('a ',timeCalc('18.16:00').add(3,'mins').add(2,'hour'))
-console.log('b ',timeCalc('02:35:00').add(3,'hours'))
-console.log('c ',timeCalc('22:15').add(135,'minute'))
-console.log('d ',timeCalc('23:30:00').subtract(135,'mins'))
-console.log('e ',timeCalc('00:15:00').subtract(3,'hour'))
